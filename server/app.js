@@ -1,10 +1,13 @@
 const express = require('express');
 const logger = require('morgan');
 
+const middleware = require('./middleware');
 const index = require('./routes/index');
 const api = require('./routes/api');
 
 const app = express();
+
+middleware.init(app);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

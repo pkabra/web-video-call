@@ -6,11 +6,12 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', (req, res) => {
+  const index = path.join(__dirname, '../../build/index.html');
   if (middleware.isDeveloping) {
-    res.write(middleware.pack.fileSystem.readFileSync(path.join(__dirname, '../../public/index.html')));
+    res.write(middleware.jsMiddleware.fileSystem.readFileSync(index));
     res.end();
   } else {
-    res.sendFile(path.join(__dirname, '../../build/index.html'));
+    res.sendFile(index);
   }
 });
 

@@ -5,14 +5,13 @@ const bodyParser = require('body-parser');
 const lessMiddleware = require('less-middleware');
 const webpack = require('webpack');
 const webpackMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
+// const webpackHotMiddleware = require('webpack-hot-middleware');
 const config = require('../webpack.config.js');
 
 const isDeveloping = process.env.NODE_ENV !== 'production';
-const compiler = webpack(config);
-const middleware = webpackMiddleware(compiler, {
+const jsCompiler = webpack(config);
+const jsMiddleware = webpackMiddleware(jsCompiler, {
   publicPath: config.output.publicPath,
-  contentBase: 'public/js',
   stats: {
     colors: true,
     hash: false,
@@ -22,20 +21,25 @@ const middleware = webpackMiddleware(compiler, {
     modules: false,
   },
 });
+const cssMiddleware = lessMiddleware(path.join(__dirname, '../public'), {
+  dest: path.join(__dirname, '../build'),
+  preprocess: {
+    path: pathname => (pathname.replace('/static', '')),
+  },
+});
 
 module.exports = {
-  pack: middleware,
+  jsMiddleware: jsMiddleware,
   isDeveloping: isDeveloping,
   init: (app) => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
-    app.use(lessMiddleware(path.join(__dirname, '../public')));
     if (isDeveloping) {
-      app.use(middleware);
-      app.use(webpackHotMiddleware(compiler));
-    } else {
-      app.use(express.static(path.join(__dirname, '../build')));
+      app.use(cssMiddleware);
+      app.use(jsMiddleware);
+      // app.use(webpackHotMiddleware(compiler));
     }
+    app.use('/static', express.static(path.join(__dirname, '../build')));
   },
 };
