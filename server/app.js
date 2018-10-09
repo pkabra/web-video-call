@@ -5,6 +5,8 @@ const middleware = require('./middleware');
 const index = require('./routes/index');
 const api = require('./routes/api');
 
+const unusedVariable = 1;
+
 const app = express();
 
 middleware.init(app);
